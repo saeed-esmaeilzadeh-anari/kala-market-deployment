@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: kala_market
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - kala-market-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - kala-market-network
+
+  backend:
+    image: your-dockerhub-user/kala-market-backend:latest
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/kala_market
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-super-secret
+      JWT_REFRESH_SECRET: your-refresh-secret
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - kala-market-network
+
+  frontend:
+    image: your-dockerhub-user/kala-market-frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3001
+    depends_on:
+      - backend
+    networks:
+      - kala-market-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  kala-market-network:
+    driver: bridge
