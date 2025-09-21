@@ -4,9 +4,9 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: kala_market
+      POSTGRES_DB: eCommerceKalamarket
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      POSTGRES_PASSWORD: 5966561
     ports:
       - "5432:5432"
     volumes:
@@ -25,12 +25,12 @@ services:
       - kala-market-network
 
   backend:
-    image: your-dockerhub-user/kala-market-backend:latest
+    build: your-dockerhub-user/kala-market-backend:latest
     ports:
       - "3001:3001"
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/kala_market
+      DATABASE_URL: postgresql://codespace:5966561@localhost:5432/eCommerceKalamarket?schema=public
       REDIS_URL: redis://redis:6379
       JWT_SECRET: your-super-secret
       JWT_REFRESH_SECRET: your-refresh-secret
@@ -41,7 +41,7 @@ services:
       - kala-market-network
 
   frontend:
-    image: your-dockerhub-user/kala-market-frontend:latest
+    build: your-dockerhub-user/kala-market-frontend:latest
     ports:
       - "3000:3000"
     environment:
